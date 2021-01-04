@@ -1,11 +1,12 @@
 import React, { Component } from "react";
 import formatCurrency from "../util";
 import Fade from "react-reveal/Fade";
+import { connect } from "react-redux";
+import { removeFromCart } from "../actions/cartActions";
 
-export default class Cart extends Component {
+class Cart extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
       name: "",
       email: "",
@@ -16,18 +17,16 @@ export default class Cart extends Component {
   handleInput = (e) => {
     this.setState({ [e.target.name]: e.target.value });
   };
-
   createOrder = (e) => {
     e.preventDefault();
     const order = {
       name: this.state.name,
       email: this.state.email,
       address: this.state.address,
-      cart: this.props.cartItems,
+      cartItems: this.props.cartItems,
     };
     this.props.createOrder(order);
   };
-
   render() {
     const { cartItems } = this.props;
     return (
@@ -46,13 +45,16 @@ export default class Cart extends Component {
                 {cartItems.map((item) => (
                   <li key={item._id}>
                     <div>
-                      <img src={item.image} alt={item.title} />
+                      <img src={item.image} alt={item.title}></img>
                     </div>
                     <div>
                       <div>{item.title}</div>
                       <div className="right">
                         {formatCurrency(item.price)} x {item.count}{" "}
-                        <button onClick={() => this.props.removeFromCart(item)}>
+                        <button
+                          className="button"
+                          onClick={() => this.props.removeFromCart(item)}
+                        >
                           Remove
                         </button>
                       </div>
@@ -94,7 +96,7 @@ export default class Cart extends Component {
                             type="email"
                             required
                             onChange={this.handleInput}
-                          />
+                          ></input>
                         </li>
                         <li>
                           <label>Name</label>
@@ -103,7 +105,7 @@ export default class Cart extends Component {
                             type="text"
                             required
                             onChange={this.handleInput}
-                          />
+                          ></input>
                         </li>
                         <li>
                           <label>Address</label>
@@ -112,7 +114,7 @@ export default class Cart extends Component {
                             type="text"
                             required
                             onChange={this.handleInput}
-                          />
+                          ></input>
                         </li>
                         <li>
                           <button className="button primary" type="submit">
@@ -131,3 +133,10 @@ export default class Cart extends Component {
     );
   }
 }
+
+export default connect(
+  (state) => ({
+    cartItems: state.cart.cartItems,
+  }),
+  { removeFromCart }
+)(Cart);
